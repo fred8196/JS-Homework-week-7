@@ -79,20 +79,91 @@ const ticketDescription = document.querySelector("#ticketDescription");
 const addBtn = document.querySelector(".addTicket-btn");
 const addForm = document.querySelector(".addTicket-form");
 
+//套票新增驗證
+const formValidate = document.querySelector(".addTicket-form");
+
+const constraints = {
+    "套票名稱": {
+        presence: {
+            message: "是必填欄位"
+        }
+    },
+    "圖片網址": {
+        presence: {
+            message: "是必填欄位"
+        }
+    },
+    "景點地區": {
+        presence: {
+            message: "是必填欄位"
+        }
+    },
+    "套票金額": {
+        presence: {
+            message: "是必填欄位",
+        },
+        numericality: {
+            onlyInteger: true,
+            greaterThan: 0,
+            message: "必須為大於0且為整數"
+        }
+    },
+    "套票組數": {
+        presence: {
+            message: "是必填欄位"
+        },
+        numericality: {
+            onlyInteger: true,
+            greaterThan: 0,
+            message: "必須為大於0且為整數"
+        }
+    },
+    "套票星級": {
+        presence: {
+            message: "是必填欄位"
+        },
+        numericality: {
+            onlyInteger: true,
+            greaterThan: 0,
+            lessThanOrEqualTo: 10,
+            message: "必須介於1-10之間，且為整數"
+        }
+    },
+    "套票描述": {
+        presence: {
+            message: "是必填欄位"
+        },
+        length: {
+            minimum: 15,
+            maximum: 100,
+            message: "限制為15-100字"
+        }
+    }
+}
 addBtn.addEventListener("click", function () {
-    data.push({
-        "id": Date.now(),
-        "name": ticketName.value,
-        "imgUrl": ticketImgUrl.value,
-        "area": ticketRegion.value,
-        "description": ticketDescription.value,
-        "group": Number(ticketNum.value),
-        "price": Number(ticketPrice.value),
-        "rate": Number(ticketRate.value)
-    })
-    renderData(data);
-    renderC3(data);
-    addForm.reset();
+    let errors = validate(formValidate, constraints);
+    let errorMessage = "";
+    console.log(errors);
+    if (errors) {
+        Object.keys(errors).forEach(function (keys) {
+            errorMessage += `${errors[keys]}\n`;
+        })
+        alert(errorMessage);
+    } else {
+        data.push({
+            "id": Date.now(),
+            "name": ticketName.value,
+            "imgUrl": ticketImgUrl.value,
+            "area": ticketRegion.value,
+            "description": ticketDescription.value,
+            "group": Number(ticketNum.value),
+            "price": Number(ticketPrice.value),
+            "rate": Number(ticketRate.value)
+        })
+        renderData(data);
+        renderC3(data);
+        addForm.reset();
+    }
 })
 
 //C3.js
@@ -110,7 +181,6 @@ function renderC3(aryC3) {
     //整理資料
     let newData = [];
     let area = Object.keys(totalObj);
-    console.log(area);
     area.forEach(function (item, index) {
         let ary = [];
         ary.push(item);
@@ -131,7 +201,11 @@ function renderC3(aryC3) {
             }
         },
         donut: {
-            title: "套票地區比重"
+            title: "套票地區比重",
+            label: {
+                show: false
+            },
+            width: 25
         }
     });
 }
